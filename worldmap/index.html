@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Coordinates Search</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-image: url("img/map.jpeg");
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* BUSCADOR */
+
+        .overlay {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 10px;
+            width: 450px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .coord-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .coord-row input {
+            width: 70px;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .coord-row select {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 6px;
+            background: #1f6feb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #195ec9;
+        }
+
+        /* MODAL */
+
+        #mapModal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-box {
+            position: relative;
+            max-width: 900px;
+            width: 80%;
+            text-align: center;
+        }
+
+        .modal-box img {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .close {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: white;
+            color: black;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 35px;
+            cursor: pointer;
+        }
+
+        .modal-message {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #7CFC9A;
+        }
+
+        .error {
+            color: #ff8080;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="overlay">
+
+        <h1>World Coordinates Search</h1>
+
+        <form id="coordForm">
+
+            <div class="section">
+                <label>Latitude</label>
+                <div class="coord-row">
+                    <input type="number" id="latDeg" placeholder="°">
+                    <input type="number" id="latMin" placeholder="'">
+                    <input type="number" id="latSec" placeholder='"'>
+                    <select id="latDir">
+                        <option value="N">N</option>
+                        <option value="S">S</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>Longitude</label>
+                <div class="coord-row">
+                    <input type="number" id="lonDeg" placeholder="°">
+                    <input type="number" id="lonMin" placeholder="'">
+                    <input type="number" id="lonSec" placeholder='"'>
+                    <select id="lonDir">
+                        <option value="E">E</option>
+                        <option value="W">W</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit">Search location</button>
+
+        </form>
+
+    </div>
+
+    <!-- MODAL -->
+
+    <div id="mapModal">
+
+        <div class="modal-box">
+
+            <div class="close" onclick="closeModal()">✕</div>
+
+            <div id="modalMessage" class="modal-message"></div>
+
+            <img id="mapImage" src="">
+
+        </div>
+
+    </div>
+
+    <script>
+
+        document.getElementById("coordForm").addEventListener("submit", function (e) {
+
+            e.preventDefault();
+
+            let latDeg = document.getElementById("latDeg").value;
+            let latMin = document.getElementById("latMin").value;
+            let latSec = document.getElementById("latSec").value;
+            let latDir = document.getElementById("latDir").value;
+
+            let lonDeg = document.getElementById("lonDeg").value;
+            let lonMin = document.getElementById("lonMin").value;
+            let lonSec = document.getElementById("lonSec").value;
+            let lonDir = document.getElementById("lonDir").value;
+
+            let modal = document.getElementById("mapModal");
+            let mapImage = document.getElementById("mapImage");
+            let modalMessage = document.getElementById("modalMessage");
+
+            /* VALIDACION */
+
+            if (latDeg === "" || latMin === "" || latSec === "" || lonDeg === "" || lonMin === "" || lonSec === "") {
+
+                modalMessage.className = "modal-message error";
+                modalMessage.innerText = "Incomplete coordinates.";
+                mapImage.style.display = "none";
+                modal.style.display = "flex";
+                return;
+
+            }
+
+
+            if (
+                latDeg == 64 &&
+                latMin == 24 &&
+                latSec == 50 &&
+                latDir == "N" &&
+                lonDeg == 21 &&
+                lonMin == 37 &&
+                lonSec == 45 &&
+                lonDir == "W"
+            ) {
+
+                modalMessage.className = "modal-message success";
+                modalMessage.innerText = "Activity detected";
+
+                mapImage.style.display = "block";
+                mapImage.src = "img/secret_location.jpg";
+            }
+            else {
+
+                modalMessage.className = "modal-message error";
+                modalMessage.innerText = "No activity detected";
+
+                let deserts = [
+                    "img/desert1.png",
+                    "img/desert2.png",
+                    "img/desert3.png",
+                    "img/desert4.png",
+                    "img/desert5.png",
+                    "img/desert6.png"
+                ];
+
+                mapImage.style.display = "block";
+                mapImage.src = deserts[Math.floor(Math.random() * deserts.length)];
+
+            }
+
+            modal.style.display = "flex";
+
+        });
+
+        function closeModal() {
+            document.getElementById("mapModal").style.display = "none";
+        }
+
+    </script>
+
+</body>
+
+</html>
